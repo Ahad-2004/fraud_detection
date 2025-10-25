@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Fraud Detection System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background: var(--primary);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: var(--gray);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--primary);
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: var(--secondary);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.05rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background-color: white;
+        }
+        
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), #1a5276);
+            color: white;
+            width: 220px;
+            margin: 0 10px 10px 0;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1a5276, var(--secondary));
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--dark), #2c3e50);
+            color: white;
+            width: 220px;
+            margin: 0 10px 10px 0;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #2c3e50, var(--dark));
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+            width: 220px;
+            margin: 0 10px 10px 0;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #27ae60, var(--success));
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .result-container {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fraud-result {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(231, 76, 60, 0.05));
+            border: 3px solid var(--danger);
+        }
+        
+        .genuine-result {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.15), rgba(46, 204, 113, 0.05));
+            border: 3px solid var(--success);
+        }
+        
+        .result-icon {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .fraud-result .result-icon {
+            color: var(--danger);
+        }
+        
+        .genuine-result .result-icon {
+            color: var(--success);
+        }
+        
+        .result-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .fraud-result .result-title {
+            color: var(--danger);
+        }
+        
+        .genuine-result .result-title {
+            color: var(--success);
+        }
+        
+        .probability {
+            font-size: 1.8rem;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 20px;
+            height: 30px;
+            margin: 30px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--secondary);
+            transition: width 1s cubic-bezier(0.22, 0.61, 0.36, 1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .fraud-result .progress-bar {
+            background: linear-gradient(90deg, var(--danger), #c0392b);
+        }
+        
+        .genuine-result .progress-bar {
+            background: linear-gradient(90deg, var(--success), #27ae60);
+        }
+        
+        .action-recommendation {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .fraud-recommendation {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+            border-left: 5px solid var(--danger);
+        }
+        
+        .genuine-recommendation {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+            border-left: 5px solid var(--success);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 6px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 6px solid var(--secondary);
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .model-info {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left: 5px solid var(--secondary);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 25px 0;
+        }
+        
+        .model-info h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .model-info h3 i {
+            color: var(--secondary);
+        }
+        
+        .model-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .model-stat {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .model-stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
+        .model-stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .input-hint {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            background: #f1f1f1;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .result-title {
+                font-size: 2rem;
+            }
+            
+            .probability {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-shield-alt"></i> Insurance Fraud Detection System</h1>
+            <p>AI-powered system to detect fraudulent insurance claims</p>
+        </header>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <div class="stat-value">17,998</div>
+                <div class="stat-label">Training Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="stat-value">94.2%</div>
+                <div class="stat-label">Model Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-value">0.5s</div>
+                <div class="stat-label">Avg. Response Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-value">72.1%</div>
+                <div class="stat-label">AUC Score</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-clipboard-list"></i> Claim Details</h2>
+            
+            <div class="model-info">
+                <h3><i class="fas fa-cogs"></i> Model Information</h3>
+                <p><strong>Algorithm:</strong> XGBoost with Hyperparameter Tuning</p>
+                <p><strong>Performance:</strong> 57.02% Recall, 72.10% ROC-AUC</p>
+                
+                <div class="model-stats">
+                    <div class="model-stat">
+                        <div class="model-stat-value">57.0%</div>
+                        <div class="model-stat-label">Fraud Detection Rate</div>
+                    </div>
+                    <div class="model-stat">
+                        <div class="model-stat-value">84.2%</div>
+                        <div class="model-stat-label">Genuine Accuracy</div>
+                    </div>
+                    <div class="model-stat">
+                        <div class="model-stat-value">24</div>
+                        <div class="model-stat-label">Features Used</div>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="fraudForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="age_of_driver">Age of Driver</label>
+                        <input type="number" id="age_of_driver" name="age_of_driver" min="18" max="80" value="40" required>
+                        <div class="input-hint">Driver's age (18-80)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="marital_status">Marital Status</label>
+                        <select id="marital_status" name="marital_status" required>
+                            <option value="1.0">Married (1.0)</option>
+                            <option value="0.0">Single (0.0)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="safty_rating">Safety Rating</label>
+                        <input type="number" id="safty_rating" name="safty_rating" min="1" max="100" value="75" required>
+                        <div class="input-hint">Safety rating (1-100)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="annual_income">Annual Income ($)</label>
+                        <input type="number" id="annual_income" name="annual_income" min="0" value="35000" required>
+                        <div class="input-hint">Annual income in dollars</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="high_education_ind">High Education Indicator</label>
+                        <select id="high_education_ind" name="high_education_ind" required>
+                            <option value="1">Yes (1)</option>
+                            <option value="0">No (0)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address_change_ind">Address Change Indicator</label>
+                        <select id="address_change_ind" name="address_change_ind" required>
+                            <option value="0">No (0)</option>
+                            <option value="1">Yes (1)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="living_status">Living Status</label>
+                        <select id="living_status" name="living_status" required>
+                            <option value="Own">Own</option>
+                            <option value="Rent">Rent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="zip_code">ZIP Code</label>
+                        <input type="number" id="zip_code" name="zip_code" min="10000" max="99999" value="50001" required>
+                        <div class="input-hint">5-digit ZIP code</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="claim_day_of_week">Claim Day of Week</label>
+                        <select id="claim_day_of_week" name="claim_day_of_week" required>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="accident_site">Accident Site</label>
+                        <select id="accident_site" name="accident_site" required>
+                            <option value="Local">Local</option>
+                            <option value="Highway">Highway</option>
+                            <option value="Parking Lot">Parking Lot</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="past_num_of_claims">Past Number of Claims</label>
+                        <input type="number" id="past_num_of_claims" name="past_num_of_claims" min="0" max="10" value="0" required>
+                        <div class="input-hint">Number of previous claims</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="witness_present_ind">Witness Present</label>
+                        <select id="witness_present_ind" name="witness_present_ind" required>
+                            <option value="1.0">Yes (1.0)</option>
+                            <option value="0.0">No (0.0)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="liab_prct">Liability Percentage</label>
+                        <input type="number" id="liab_prct" name="liab_prct" min="0" max="1" step="0.01" value="0.5" required>
+                        <div class="input-hint">Liability percentage (0-1)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="channel">Channel</label>
+                        <select id="channel" name="channel" required>
+                            <option value="Broker">Broker</option>
+                            <option value="Online">Online</option>
+                            <option value="Phone">Phone</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="policy_report_filed_ind">Policy Report Filed</label>
+                        <select id="policy_report_filed_ind" name="policy_report_filed_ind" required>
+                            <option value="1">Yes (1)</option>
+                            <option value="0">No (0)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="claim_est_payout">Claim Estimated Payout ($)</label>
+                        <input type="number" id="claim_est_payout" name="claim_est_payout" min="0" value="5000" required>
+                        <div class="input-hint">Estimated payout amount</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age_of_vehicle">Age of Vehicle</label>
+                        <input type="number" id="age_of_vehicle" name="age_of_vehicle" min="0" max="30" step="0.1" value="5" required>
+                        <div class="input-hint">Vehicle age in years</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vehicle_category">Vehicle Category</label>
+                        <select id="vehicle_category" name="vehicle_category" required>
+                            <option value="Medium">Medium</option>
+                            <option value="Compact">Compact</option>
+                            <option value="Large">Large</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vehicle_price">Vehicle Price ($)</label>
+                        <input type="number" id="vehicle_price" name="vehicle_price" min="0" value="20000" required>
+                        <div class="input-hint">Vehicle value in dollars</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vehicle_color">Vehicle Color</label>
+                        <select id="vehicle_color" name="vehicle_color" required>
+                            <option value="white">White</option>
+                            <option value="black">Black</option>
+                            <option value="gray">Gray</option>
+                            <option value="blue">Blue</option>
+                            <option value="red">Red</option>
+                            <option value="silver">Silver</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vehicle_weight">Vehicle Weight (lbs)</label>
+                        <input type="number" id="vehicle_weight" name="vehicle_weight" min="1000" max="10000" step="0.01" value="3000" required>
+                        <div class="input-hint">Vehicle weight in pounds</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="claim_year">Claim Year</label>
+                        <input type="number" id="claim_year" name="claim_year" min="2015" max="2025" value="2022" required>
+                        <div class="input-hint">Year of claim</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="claim_month">Claim Month</label>
+                        <input type="number" id="claim_month" name="claim_month" min="1" max="12" value="6" required>
+                        <div class="input-hint">Month of claim (1-12)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="claim_day">Claim Day</label>
+                        <input type="number" id="claim_day" name="claim_day" min="1" max="31" value="15" required>
+                        <div class="input-hint">Day of claim (1-31)</div>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Check for Fraud
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillSampleData()">
+                        <i class="fas fa-dice"></i> Fill Sample Data
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="fillHighRiskData()">
+                        <i class="fas fa-exclamation-triangle"></i> High Risk Sample
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <h3>Analyzing claim for potential fraud...</h3>
+            <p>Our AI model is processing your claim details</p>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="result-icon" id="resultIcon">✅</div>
+            <h2 class="result-title" id="resultTitle">Genuine Claim</h2>
+            <p class="probability" id="probability">Probability of Fraud: <span id="fraudPercent">0</span>%</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            
+            <div class="action-recommendation" id="recommendation">
+                Standard processing can proceed
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Sample data for demonstration
+        const sampleData = {
+            age_of_driver: 45,
+            gender: "M",
+            marital_status: "1.0",
+            safty_rating: 85,
+            annual_income: 40000,
+            high_education_ind: "1",
+            address_change_ind: "0",
+            living_status: "Own",
+            zip_code: 80022,
+            claim_day_of_week: "Monday",
+            accident_site: "Local",
+            past_num_of_claims: 1,
+            witness_present_ind: "1.0",
+            liab_prct: 0.6,
+            channel: "Broker",
+            policy_report_filed_ind: "1",
+            claim_est_payout: 6000,
+            age_of_vehicle: 4.0,
+            vehicle_category: "Medium",
+            vehicle_price: 25000,
+            vehicle_color: "white",
+            vehicle_weight: 3200,
+            claim_year: 2022,
+            claim_month: 6,
+            claim_day: 15
+        };
+
+        // High risk sample data
+        const highRiskData = {
+            age_of_driver: 25,
+            gender: "M",
+            marital_status: "0.0",
+            safty_rating: 40,
+            annual_income: 25000,
+            high_education_ind: "0",
+            address_change_ind: "1",
+            living_status: "Rent",
+            zip_code: 15024,
+            claim_day_of_week: "Sunday",
+            accident_site: "Highway",
+            past_num_of_claims: 3,
+            witness_present_ind: "0.0",
+            liab_prct: 0.9,
+            channel: "Online",
+            policy_report_filed_ind: "0",
+            claim_est_payout: 15000,
+            age_of_vehicle: 8.0,
+            vehicle_category: "Large",
+            vehicle_price: 40000,
+            vehicle_color: "red",
+            vehicle_weight: 4500,
+            claim_year: 2022,
+            claim_month: 12,
+            claim_day: 25
+        };
+
+        function fillSampleData() {
+            for (const [key, value] of Object.entries(sampleData)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = value;
+                }
+            }
+            showNotification("Sample data filled successfully!", "success");
+        }
+
+        function fillHighRiskData() {
+            for (const [key, value] of Object.entries(highRiskData)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = value;
+                }
+            }
+            showNotification("High-risk sample data filled!", "success");
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        document.getElementById('fraudForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading, hide result
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultContainer').style.display = 'none';
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                // Convert numeric fields
+                if (key === 'age_of_driver' || key === 'safty_rating' || 
+                    key === 'annual_income' || key === 'zip_code' || 
+                    key === 'past_num_of_claims' || key === 'liab_prct' || 
+                    key === 'claim_est_payout' || key === 'age_of_vehicle' || 
+                    key === 'vehicle_price' || key === 'vehicle_weight' || 
+                    key === 'claim_year' || key === 'claim_month' || 
+                    key === 'claim_day') {
+                    data[key] = parseFloat(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            try {
+                // Call your backend API to get prediction
+                // Replace with your actual API endpoint
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `API error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Update result based on API response
+                const isFraud = result.is_fraud;
+                const fraudProbability = result.fraud_probability_percentage;
+                
+                // Update UI based on result
+                if (isFraud) {
+                    document.getElementById('resultContainer').className = 'result-container fraud-result';
+                    document.getElementById('resultIcon').innerHTML = '⚠️';
+                    document.getElementById('resultTitle').textContent = 'FRAUDULENT CLAIM DETECTED';
+                    document.getElementById('resultTitle').style.color = '#e74c3c';
+                    document.getElementById('recommendation').textContent = 'ALERT: This claim is flagged as potentially fraudulent! Investigate further.';
+                    document.getElementById('recommendation').className = 'action-recommendation fraud-recommendation';
+                } else {
+                    document.getElementById('resultContainer').className = 'result-container genuine-result';
+                    document.getElementById('resultIcon').innerHTML = '✅';
+                    document.getElementById('resultTitle').textContent = 'GENUINE CLAIM';
+                    document.getElementById('resultTitle').style.color = '#2ecc71';
+                    document.getElementById('recommendation').textContent = 'This claim appears to be genuine. Standard processing can proceed.';
+                    document.getElementById('recommendation').className = 'action-recommendation genuine-recommendation';
+                }
+                
+                // Update probability and progress bar with animation
+                document.getElementById('fraudPercent').textContent = fraudProbability.toFixed(1);
+                
+                // Animate the progress bar
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.width = fraudProbability + '%';
+                    progressBar.textContent = Math.round(fraudProbability) + '%';
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                // Show error message
+                document.getElementById('resultContainer').className = 'result-container';
+                document.getElementById('resultIcon').innerHTML = '❌';
+                document.getElementById('resultTitle').textContent = 'Error Processing Request';
+                document.getElementById('resultTitle').style.color = '#e74c3c';
+                document.getElementById('probability').textContent = 'Please try again later';
+                document.getElementById('recommendation').textContent = 'There was an error processing your request. Please make sure your backend server is running on http://127.0.0.1:5000';
+                document.getElementById('recommendation').className = 'action-recommendation fraud-recommendation';
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultContainer').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

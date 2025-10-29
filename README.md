@@ -20,6 +20,8 @@ fraud_detection/
 ├── scaler.pkl                  # Feature scaler for data preprocessing
 ├── label_encoders.pkl          # Label encoders for categorical features
 ├── requirements.txt            # Python dependencies
+├── test_2021.csv               # csv file
+├── training data.csv           # csv file
 └── README.md                   # Project documentation
 ```
 
@@ -157,18 +159,3 @@ All prediction requests should be JSON objects with the required features for th
    - Check the health endpoint for model status
    - Review server logs for detailed error messages
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-
-For questions or support, please open an issue in the GitHub repository.

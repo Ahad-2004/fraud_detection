@@ -22,11 +22,14 @@ fraud_detection/
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Project documentation
 ```
-##dataset
-'https://www.kaggle.com/datasets/surekharamireddy/fraudulent-claim-on-cars-physical-damage'
 
+## Dataset
 
+This project uses the **Fraudulent Claims on Cars Physical Damage** dataset from Kaggle, which contains information about fraudulent claims in the insurance industry.
 
+- **Dataset Link**: [Fraudulent Claim on Cars Physical Damage](https://www.kaggle.com/datasets/surekharamireddy/fraudulent-claim-on-cars-physical-damage)
+
+The dataset includes features related to the insurance claim details, such as claim amounts, car damage, and various other characteristics that can be used to predict whether a claim is fraudulent or not.
 
 ## Installation
 
